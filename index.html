@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rock · Paper · Scissors</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="table">
+    <header class="top">
+      <h1>Rock · Paper · Scissors</h1>
+      <p class="rule">First to <span id="target">5</span></p>
+    </header>
+
+    <section class="seat seat--cpu" aria-label="Computer">
+      <div class="label">Computer <span class="score" id="cpu-score">0</span></div>
+      <div class="card card--cpu" id="cpu-card" aria-live="polite">
+        <div class="card__inner">
+          <div class="card__face card__back"></div>
+          <div class="card__face card__front" id="cpu-front"></div>
+        </div>
+      </div>
+    </section>
+
+    <p class="status" id="status" aria-live="polite">Choose a card</p>
+
+    <section class="seat seat--you" aria-label="You">
+      <div class="hand" id="hand">
+        <!-- cards built by script.js -->
+      </div>
+      <div class="label">You <span class="score" id="you-score">0</span></div>
+    </section>
+
+    <footer class="bottom">
+      <button class="btn" id="reset" type="button">New game</button>
+      <span class="hint">Keys: R · P · S · N for new game</span>
+    </footer>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
