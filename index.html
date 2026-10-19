@@ -4,39 +4,57 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Rock · Paper · Scissors</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,800&display=swap">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <main class="table">
-    <header class="top">
-      <h1>Rock · Paper · Scissors</h1>
-      <p class="rule">First to <span id="target">5</span></p>
-    </header>
+  <canvas id="fx" aria-hidden="true"></canvas>
 
-    <section class="seat seat--cpu" aria-label="Computer">
-      <div class="label">Computer <span class="score" id="cpu-score">0</span></div>
-      <div class="card card--cpu" id="cpu-card" aria-live="polite">
-        <div class="card__inner">
-          <div class="card__face card__back"></div>
-          <div class="card__face card__front" id="cpu-front"></div>
-        </div>
+  <main class="table" id="table">
+    <h1 class="title">Rock · Paper · Scissors</h1>
+
+    <section class="scoreboard" aria-label="Score">
+      <div class="side side--you">
+        <span class="who">You</span>
+        <span class="num" id="you-score">0</span>
+        <div class="pips" id="you-pips"></div>
+      </div>
+      <span class="vs">first to <span id="target">5</span></span>
+      <div class="side side--cpu">
+        <span class="who">Computer</span>
+        <span class="num" id="cpu-score">0</span>
+        <div class="pips" id="cpu-pips"></div>
       </div>
     </section>
 
-    <p class="status" id="status" aria-live="polite">Choose a card</p>
-
-    <section class="seat seat--you" aria-label="You">
-      <div class="hand" id="hand">
-        <!-- cards built by script.js -->
+    <div class="slot slot--cpu" id="cpu-slot">
+      <div class="flipper" id="flipper">
+        <div class="card card--back"></div>
+        <div class="card card--front" id="cpu-front"></div>
       </div>
-      <div class="label">You <span class="score" id="you-score">0</span></div>
-    </section>
+    </div>
+
+    <p class="status" id="status" aria-live="polite">Your move</p>
+
+    <div class="hand" id="hand">
+      <!-- cards built by script.js -->
+    </div>
 
     <footer class="bottom">
       <button class="btn" id="reset" type="button">New game</button>
       <span class="hint">Keys: R · P · S · N for new game</span>
     </footer>
   </main>
+
+  <div class="overlay" id="overlay" hidden>
+    <div class="panel">
+      <p class="panel__title" id="over-title"></p>
+      <p class="panel__score" id="over-score"></p>
+      <button class="btn btn--solid" id="again" type="button">Play again</button>
+    </div>
+  </div>
 
   <script src="script.js"></script>
 </body>
