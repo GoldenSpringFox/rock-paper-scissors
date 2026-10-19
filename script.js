@@ -42,6 +42,7 @@ const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 let target = TARGETS.includes(load("rps.target", 5)) ? load("rps.target", 5) : 5;
 let effects = load("rps.effects", true) !== false;
+Sound.enabled = load("rps.sound", true) !== false;
 let score = { you: 0, cpu: 0 };
 let phase = "choosing"; // choosing | ready | revealing | result | over
 let token = 0; // bumps every round / new game so stale timers are ignored
@@ -73,6 +74,9 @@ function buildHand() {
     slot.setAttribute("aria-label", `Play ${move}`);
     slot.innerHTML = `<div class="card" data-move="${move}" style="--i:${i}">${cardFace(move)}</div>`;
     slot.addEventListener("click", () => play(move));
+    slot.addEventListener("pointerenter", () => {
+      if (!hand.classList.contains("locked") && phase !== "over") Sound.tick();
+    });
     hand.appendChild(slot);
   });
 }
@@ -103,6 +107,7 @@ function buildPips() {
 }
 
 function deal() {
+  for (let i = 0; i < 3; i++) Sound.swish({ at: i * 0.07, gain: 0.1 });
   for (const el of [...hand.querySelectorAll(".card"), ...cpuHand.children]) {
     restartClass(el, "deal");
     el.addEventListener("animationend", () => el.classList.remove("deal"), { once: true });
@@ -136,6 +141,7 @@ function startRound(delay = 0) {
     fan.forEach((c) => c.classList.remove("lift"));
     if (n < hops.length) {
       fan[hops[n++]].classList.add("lift");
+      Sound.tick({ gain: 0.035, freq: 1300 });
       after(TIMING.hop, t, hop);
     } else {
       dealToSpot(fan[pick], pick, t);
@@ -148,6 +154,7 @@ function dealToSpot(card, i, t) {
   const dx = cpuSpot.offsetLeft - (cpuHand.offsetLeft + card.offsetLeft);
   const dy = cpuSpot.offsetTop - (cpuHand.offsetTop + card.offsetTop);
   card.classList.add("flying");
+  Sound.swish();
   card.style.setProperty("--fx", `${dx}px`);
   card.style.setProperty("--fy", `${dy}px`);
   card.style.setProperty("--r", "0deg");
@@ -159,6 +166,7 @@ function dealToSpot(card, i, t) {
     restFan(card, i);
     cpuSlot.classList.add("dealt");
     restartClass(cpuSlot, "land");
+    Sound.thud();
     const r = cpuSpot.getBoundingClientRect();
     burst(cpuSpot, { colors: COLORS.puff, count: 8, speed: 2, gravity: 0, size: [2, 4], from: { x: r.left + r.width / 2, y: r.bottom, angle: -Math.PI / 2, spread: Math.PI } });
 
@@ -192,12 +200,14 @@ function play(move) {
   markPicked(move);
   pickedSlot = hand.querySelector(`[data-move="${move}"]`);
   sendToSpot(pickedSlot, true);
+  Sound.swish();
   setStatus("…", "wait");
 
   after(TIMING.playFly, t, () => {
     cpuFront.dataset.move = cpuMove;
     cpuFront.innerHTML = cardFace(cpuMove);
     cpuSlot.classList.add("flipped");
+    Sound.snap();
     after(TIMING.flip, t, () => resolve(move, cpuMove, pickedSlot));
   });
 }
@@ -213,6 +223,7 @@ function resolve(move, cpu, yourSlot) {
     burst(youSpot, { colors: COLORS.gold, count: 36, speed: 7 });
     bumpScore("you");
     quake();
+    Sound.win();
     setStatus(`${cap(move)} ${MOVES[move].verb} ${cpu}!`, "win");
   } else if (result === "lose") {
     score.cpu++;
@@ -221,12 +232,14 @@ function resolve(move, cpu, yourSlot) {
     burst(cpuSlot, { colors: COLORS.red, count: 28, speed: 6 });
     bumpScore("cpu");
     quake();
+    Sound.lose();
     setStatus(`${cap(cpu)} ${MOVES[cpu].verb} ${move}`, "lose");
   } else {
     yourSlot.classList.add("draw-wobble");
     cpuSlot.classList.add("draw-wobble");
     for (const el of [youSpot, cpuSpot]) burst(el, { colors: COLORS.puff, count: 10, speed: 2.5, gravity: 0.02, size: [3, 6] });
     setStatus("Draw");
+    Sound.draw();
   }
 
   if (score.you >= target || score.cpu >= target) {
@@ -243,6 +256,7 @@ function resolve(move, cpu, yourSlot) {
 function collectCpuCard() {
   if (!cpuSlot.classList.contains("dealt")) return;
   restartClass(cpuSlot, "collect");
+  Sound.swish({ gain: 0.07 });
   setTimeout(() => {
     flipper.style.transition = "none";
     cpuSlot.className = "slot slot--cpu";
@@ -286,6 +300,8 @@ function endGame() {
   $("over-score").textContent = `${score.you} – ${score.cpu}`;
   overlay.hidden = false;
   $("again").focus();
+  if (youWon) Sound.gameWin();
+  else Sound.gameLose();
   if (youWon) celebrate();
   else burst(cpuSlot, { colors: COLORS.red, count: 50, speed: 8 });
 }
@@ -316,6 +332,8 @@ function toggleSettings(open = settingsEl.hidden) {
 function renderSettings() {
   document.querySelectorAll("#target-seg button").forEach((b) => b.classList.toggle("on", +b.dataset.target === target));
   $("fx-toggle").setAttribute("aria-checked", effects);
+  $("sound-toggle").setAttribute("aria-checked", Sound.enabled);
+  $("sound-btn").setAttribute("aria-pressed", Sound.enabled);
 }
 
 $("target-seg").addEventListener("click", (e) => {
@@ -332,6 +350,14 @@ $("fx-toggle").addEventListener("click", () => {
   save("rps.effects", effects);
   renderSettings();
 });
+
+function toggleSound() {
+  Sound.enabled = !Sound.enabled;
+  save("rps.sound", Sound.enabled);
+  renderSettings();
+}
+$("sound-toggle").addEventListener("click", toggleSound);
+$("sound-btn").addEventListener("click", toggleSound);
 
 settingsBtn.addEventListener("click", (e) => {
   e.stopPropagation();
@@ -385,6 +411,7 @@ function bumpScore(who) {
   restartClass($(`${who}-score`), "bump");
   const dot = $(`${who}-pips`).children[score[who] - 1];
   if (dot) restartClass(dot, "fresh");
+  Sound.chip({ at: 0.15 });
 }
 
 function quake() {
@@ -489,6 +516,12 @@ function tick() {
 }
 
 /* ---------- Wiring ---------- */
+
+// Audio may only start after a user gesture; capture runs before the click handlers that play sounds.
+for (const type of ["pointerdown", "keydown"]) document.addEventListener(type, Sound.unlock, true);
+document.addEventListener("click", (e) => {
+  if (e.target.closest(".icon-btn, .seg button, .switch, .btn")) Sound.click();
+});
 
 $("reset").addEventListener("click", newGame);
 $("settings-new").addEventListener("click", () => {

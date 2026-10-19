@@ -116,6 +116,9 @@ body {
   transition: transform 0.4s cubic-bezier(.3, 1.4, .5, 1);
 }
 #reset:hover svg { transform: rotate(-200deg); }
+#sound-btn .off, #sound-btn[aria-pressed="false"] .on { display: none; }
+#sound-btn[aria-pressed="false"] .off { display: inline; }
+#sound-btn[aria-pressed="false"] { color: var(--muted); }
 #settings-btn:hover svg { transform: rotate(45deg); }
 #settings-btn[aria-expanded="true"] svg { transform: rotate(90deg); }
 

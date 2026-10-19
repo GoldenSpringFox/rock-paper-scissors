@@ -105,6 +105,9 @@
         <button class="icon-btn" id="reset" type="button" aria-label="New game" title="New game (N)">
           <svg viewBox="0 0 24 24"><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
         </button>
+        <button class="icon-btn" id="sound-btn" type="button" aria-label="Sound" title="Sound" aria-pressed="true">
+          <svg viewBox="0 0 24 24"><path d="M11 5 6 9H2v6h4l5 4V5z"/><g class="on"><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></g><g class="off"><path d="m23 9-6 6"/><path d="m17 9 6 6"/></g></svg>
+        </button>
         <button class="icon-btn" id="settings-btn" type="button" aria-label="Settings" title="Settings" aria-expanded="false" aria-controls="settings">
           <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
         </button>
@@ -118,6 +121,10 @@
             <button type="button" data-target="5">5</button>
             <button type="button" data-target="7">7</button>
           </div>
+        </div>
+        <div class="settings__row">
+          <span class="settings__label">Sound</span>
+          <button class="switch" id="sound-toggle" type="button" role="switch" aria-checked="true" aria-label="Sound effects"></button>
         </div>
         <div class="settings__row">
           <span class="settings__label">Effects</span>
@@ -183,6 +190,7 @@
     </div>
   </div>
 
+  <script src="sound.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
